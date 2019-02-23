@@ -17,7 +17,7 @@
 #Universal .dmg / .pkg installer
 #Bash script to retrieve .pkg or .dmg from a url, install it appropriately based on filetype retrieved from url, and delete cached contents
 #Pandora Media Inc. - Cole Johnson (https://www.linkedin.com/in/coleojohnson/), Jess McLaughlin 10-12-18
-#Intended for macOS administration with administrative programs like JAMF or Apple DEP
+#Intended for macOS administration with administrative appliances like JAMF or Apple DEP
 
 
 # $4 - URL from which to download (If no download repository is available for the app, this link can often be pulled from a "Download Now" button on a trusted-company-website.
@@ -29,6 +29,9 @@
 #This script was designed to utilize args[4] and args[5] parameters in JAMF
 
 #Begin Script Workflow..
+
+#Set action to terminate script upon error
+set -e
 
 #Set default args variables as friendly-names
 installer_url=$4
@@ -42,6 +45,16 @@ echo "Downloading installer and installing $package_friendly_name.."
 # Create temporary directory path variable
 tempdir="/tmp/$package_friendly_name"
 echo "temp directory: $tempdir"
+
+#If directory already exists, delete it and start over
+if [ -d "$tempdir" ]; then
+echo "Temp folder for this app already exists.. Deleting the folder and its contents and creating a fresh new directory.."
+rm -rf "$tempdir" || {
+echo "Error removing old temporary directory"
+exit 1
+}
+fi
+
 #Create temp directory
 mkdir "$tempdir"
 echo "$tempdir has been created.. "
@@ -52,7 +65,12 @@ echo "changed directories to $tempdir .. "
 
 echo "downloading installer from $installer_url"
 
-curl -L "$installer_url" -o installer
+#Try and download the app via curl. If it fails, echo error message and exit with error message and unspecified error code (1)
+​
+curl -L "$installer_url" -o installer || {
+echo "Error - App download failure!"
+exit 1
+}
 
 #Find name of what was downloaded and cast name to variable
 installer="$(ls "$tempdir")"
