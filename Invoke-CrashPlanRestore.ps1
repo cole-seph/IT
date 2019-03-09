@@ -18,7 +18,7 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
 
 #Code42 CrashPlan Push Restore Powershell Script - Cole Johnson (https://www.linkedin.com/in/coleojohnson/) - Pandora Media Inc. - 10/12/2018
 
-function Push-CrashPlanRestore {
+function Invoke-CrashPlanRestore {
 <#
 
 	.SYNOPSIS
@@ -72,7 +72,7 @@ function Push-CrashPlanRestore {
 		$EncodedPassword = [System.Convert]::ToBase64String($Encoded)
 		$headers = @{ "Authorization" = "Basic $($EncodedPassword)" }
 
-		#DECLARE TLS 1.2 as apparently CP API past Server version 5.3.1 (on 6.7 at time of writing)
+		#DECLARE TLS 1.2 as required by CP API past Server version 5.3.1 (on 6.7 at time of writing)
 		[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
 
