@@ -68,7 +68,7 @@
 ## 8. Check logs in "/tmp/YOUR_COMPANY_NAME_HEREJamfPatchingDependencies"
 
 companyName='YOUR_COMPANY_NAME_HERE' ## Leave the single quotations. Do not include spaces or special characters
-
+errVariable = ''
 
 ## Steps to upload into JAMF via the JAMF console
 ## 1. Upload this script to JAMF scripts by going to JAMF console -> Settings -> Computer Management -> Scripts -> New
@@ -102,6 +102,95 @@ companyName='YOUR_COMPANY_NAME_HERE' ## Leave the single quotations. Do not incl
 ## If specified in your parameter inputs, take the user directly to Software Update in System Preferences once the user dimisses or force-closes the patch prompt
 ## Exit the script
 
+function printErrorsAndExit {
+    echo 'Required parameters'
+    echo 'Parameter 1: Desired OS Version'
+    echo 'Parameter 2: Software Updates In System Preferences'
+    echo 'Parameter 3: Check for updates for machines whose OS version is already up to date'
+    echo 'Parameter 4: Banner text'
+    echo 'Parameter 5: Title'
+    echo 'Parameter 6: Message body'
+    echo 'Optional parameters'
+    echo 'Parameter 7: icon URL'
+    echo 'Parameter 8: timeout'
+
+    echo "Stopping execution with error: $errVariable"
+    exit 1
+}
+
+function validateAndClearTempDirectories {
+    #################### Icon parameter and additional logic #####
+
+    #If jamf patch dependency directory already exists, delete it and start over
+    ## Use the /tmp directory as it clears on reboot and therefore doesn't leave junk lying around on endpoints
+    iconDirectory="/tmp/${companyName}JamfPatchingDependencies"
+    if [ -d "$iconDirectory" ]; then
+        echo "Temp JAMF Patching Dependencies folder already exists.. Deleting the folder and its contents and creating a fresh new directory.."
+    rm -rf "$iconDirectory" || {
+        errVariable = "Error removing old temporary directory"
+        printErrorsAndExit
+    }
+    fi
+
+    #Create temp directory
+    mkdir "$iconDirectory"
+    echo "$iconDirectory has been created.. "
+
+    # Grab icon from a publicly-accessible url
+    # TODO: test that the URL is accessible
+    echo "Downloading latest patching prompt icon.."
+    curl -L "$promptIconUrl" -o "${iconDirectory}/jamf${companyName}IconFile.png"
+    iconFile="${iconDirectory}/jamf${companyName}IconFile.png"
+
+
+#################### End Icon parameter and additional logic #####
+}
+
+function checkForUpdatesAndPrompt {
+    echo "JAMF admin has defined the desired OS version as: $desiredOSVersionFullString"
+    echo "Local OS version is: $osVersionFullString"
+
+    ## Check for updates. Parse out ones that require a restart and ones that do not.
+    updates=`softwareupdate -l`
+    echo "Updates that were found were: $updates"
+    updatesNoRestart=`echo $updates | grep recommended | grep -v restart`
+    [[ -z $updatesNoRestart ]] && updatesNoRestart="none"
+    restartRequired=`echo $updates | grep restart | grep -v '\*' | cut -d , -f 1`
+    [[ -z $restartRequired ]] && restartRequired="none"
+    shutDownRequired=`echo $updates | grep shutdown | grep -v '\*' | cut -d , -f 1`
+    [[ -z $shutDownRequired ]] && shutDownRequired="none"
+
+    ## Test Variables #
+    ## Reboot State Test Variables 
+    # shutDownRequired='true'
+    # updatesNoRestart='true'
+    # restartRequired='true'
+    ## End test Variables #
+
+
+    ## If there are no system updates, quit
+    if [[ $updatesNoRestart = "none" && $restartRequired = "none" && $shutDownRequired = "none" ]]; then
+        echo "No updates found at this time. Exiting script with success code."
+        exit 0
+    else
+
+    # There are pending updates. So prompt the user..
+    prompt=`"/Library/Application Support/JAMF/bin/jamfHelper.app/Contents/MacOS/jamfHelper" -windowType hud -title "$promptHeading" -heading "$promptMessageTitle" -alignHeading justified -description "$promptMessageBodyText" -alignDescription left -button1 "$promptButtonText" -timeout $promptTimeoutSeconds -countdown -lockHUD -icon $iconFile`
+    echo "User prompt button equaled: $prompt. ( Guide for what each user action equals: 0=start (user clicked 'ok'), 1=failed to prompt, 2=canceled, 239=exited. )"
+        ## leaving this bit in the script. If you want to define actions ONLY if a user clicks the 'ok' prompt button, use the following lines:
+        # if [[$prompt -eq '0']] .. etc etc..
+        if [[ $openSoftwareUpdatesInSystemPreferences = "true" ]]; then
+        echo "JAMF admin opted to open Software Update panel in System Preferences. Opening Software Update panel.."
+        # Open Software Update pane in system preferences
+        open "x-apple.systempreferences:com.apple.preferences.softwareupdate?client=softwareupdateapp"
+        else 
+            echo "Updates were found but JAMF admin opted NOT to open Software Update panel in System Preferences."
+        exit 0;
+        fi
+        ## script will now take user to JAMF policy built-in Software Update component. IF FORCING UPDATES WITH THIS SCRIPT, MAKE SURE SCRIPT PRIORITY IS SET TO 'BEFORE'!
+    fi
+}
+
 echo "Starting script.. Date: $(date +"%Y-%b-%d %T")"
 
 #################### Validate required inputs #####
@@ -109,33 +198,33 @@ echo "Starting script.. Date: $(date +"%Y-%b-%d %T")"
 echo "####################"
 echo "Validating required parameters.."
 if [ ! -n "$4" ]; then
-    echo "Error! 1st JAMF input variable null.  Please define the desired OS version. Exiting script.."
-    exit 1
+    errVariable = "Error! 1st JAMF input variable null.  Please define the desired OS version. Exiting script.."
+    printErrorsAndExit
 fi
 
 if [ ! -n "$5" ]; then
-    echo "Error! 2nd JAMF input variable null. Please enter 'true' or 'false' for to specify the 'openSoftwareUpdatesInSystemPreferences' variable. If true, both a message prompt AND take the user to the built in macOS softwareupdates page in System Preferences to check for updates. Warning will ONLY prompt the user. Forced patching itself should be handled via the JAMF policy UI. Warning mode will not automatically install patches. Exiting script.."    exit 1
-    exit 1
+    errVariable = "Error! 2nd JAMF input variable null. Please enter 'true' or 'false' for to specify the 'openSoftwareUpdatesInSystemPreferences' variable. If true, both a message prompt AND take the user to the built in macOS softwareupdates page in System Preferences to check for updates. Warning will ONLY prompt the user. Forced patching itself should be handled via the JAMF policy UI. Warning mode will not automatically install patches. Exiting script.."    exit 1
+	printErrorsAndExit
 fi
 
 if [ ! -n "$6" ]; then
-    echo "Error! 3rd JAMF input variable null. Please define whether or not to check for updates if OS version already up to date (input 'true' or 'false'). Exiting script.."
-    exit 1
+    errVariable = "Error! 3rd JAMF input variable null. Please define whether or not to check for updates if OS version already up to date (input 'true' or 'false'). Exiting script.."
+	printErrorsAndExit
 fi
 
 if [ ! -n "$7" ]; then
-    echo "Error! 4th JAMF input variable null. Please define prompt banner heading. Exiting script.."
-    exit 1
+    errVariable = "Error! 4th JAMF input variable null. Please define prompt banner heading. Exiting script.."
+	printErrorsAndExit
 fi
 
 if [ ! -n "$8" ]; then
-    echo "Error! 5th JAMF input variable null. Please define prompt message title. Exiting script.."
-    exit 1
+    errVariable = "Error! 5th JAMF input variable null. Please define prompt message title. Exiting script.."
+	printErrorsAndExit
 fi
 
 if [ ! -n "$9" ]; then
-    echo "Error! 6th JAMF input variable null. Please define prompt message body. Exiting script.."
-    exit 1
+    errVariable = "Error! 6th JAMF input variable null. Please define prompt message body. Exiting script.."
+	printErrorsAndExit
 fi
 
 echo "Required parameters validated. Proceeding.."
@@ -144,8 +233,6 @@ echo "Required parameters validated. Proceeding.."
 #################### End validate required inputs
 
 
-
-#################### Icon parameter and additional logic #####
 ## check to see if prompt icon url parameter has been set. If not, use default value
 if [ ! -n "${10}" ]; then
     echo "7th JAMF input variable (JAMF prompt icon url) not set. Defaulting prompt icon url to default url." 
@@ -157,28 +244,6 @@ else
     echo "Prompt icon url specified by JAMF input parameter: ${promptIconUrl}"
 fi
 
-#If jamf patch dependency directory already exists, delete it and start over
-## Use the /tmp directory as it clears on reboot and therefore doesn't leave junk lying around on endpoints
-iconDirectory="/tmp/${companyName}JamfPatchingDependencies"
-if [ -d "$iconDirectory" ]; then
-echo "Temp JAMF Patching Dependencies folder already exists.. Deleting the folder and its contents and creating a fresh new directory.."
-rm -rf "$iconDirectory" || {
-echo "Error removing old temporary directory"
-exit 1
-}
-fi
-
-#Create temp directory
-mkdir "$iconDirectory"
-echo "$iconDirectory has been created.. "
-
-# Grab icon from a publicly-accessible url
-echo "Downloading latest patching prompt icon.."
-curl -L "$promptIconUrl" -o "${iconDirectory}/jamf${companyName}IconFile.png"
-iconFile="${iconDirectory}/jamf${companyName}IconFile.png"
-
-
-#################### End Icon parameter and additional logic #####
 
 
 ## check to see if custom prompt timeout has been set. If not, use default value
@@ -288,50 +353,7 @@ echo "Logged in user is: $LoggedInUser"
 # button1="Ok"
 ## End test Variables #
 
-function checkForUpdatesAndPrompt {
-    echo "JAMF admin has defined the desired OS version as: $desiredOSVersionFullString"
-    echo "Local OS version is: $osVersionFullString"
 
-    ## Check for updates. Parse out ones that require a restart and ones that do not.
-    updates=`softwareupdate -l`
-    echo "Updates that were found were: $updates"
-    updatesNoRestart=`echo $updates | grep recommended | grep -v restart`
-    [[ -z $updatesNoRestart ]] && updatesNoRestart="none"
-    restartRequired=`echo $updates | grep restart | grep -v '\*' | cut -d , -f 1`
-    [[ -z $restartRequired ]] && restartRequired="none"
-    shutDownRequired=`echo $updates | grep shutdown | grep -v '\*' | cut -d , -f 1`
-    [[ -z $shutDownRequired ]] && shutDownRequired="none"
-
-    ## Test Variables #
-    ## Reboot State Test Variables 
-    # shutDownRequired='true'
-    # updatesNoRestart='true'
-    # restartRequired='true'
-    ## End test Variables #
-
-
-    ## If there are no system updates, quit
-    if [[ $updatesNoRestart = "none" && $restartRequired = "none" && $shutDownRequired = "none" ]]; then
-        echo "No updates found at this time. Exiting script with success code."
-        exit 0
-    else
-
-    # There are pending updates. So prompt the user..
-    prompt=`"/Library/Application Support/JAMF/bin/jamfHelper.app/Contents/MacOS/jamfHelper" -windowType hud -title "$promptHeading" -heading "$promptMessageTitle" -alignHeading justified -description "$promptMessageBodyText" -alignDescription left -button1 "$promptButtonText" -timeout $promptTimeoutSeconds -countdown -lockHUD -icon $iconFile`
-    echo "User prompt button equaled: $prompt. ( Guide for what each user action equals: 0=start (user clicked 'ok'), 1=failed to prompt, 2=canceled, 239=exited. )"
-        ## leaving this bit in the script. If you want to define actions ONLY if a user clicks the 'ok' prompt button, use the following lines:
-        # if [[$prompt -eq '0']] .. etc etc..
-        if [[ $openSoftwareUpdatesInSystemPreferences = "true" ]]; then
-        echo "JAMF admin opted to open Software Update panel in System Preferences. Opening Software Update panel.."
-        # Open Software Update pane in system preferences
-        open "x-apple.systempreferences:com.apple.preferences.softwareupdate?client=softwareupdateapp"
-        else 
-            echo "Updates were found but JAMF admin opted NOT to open Software Update panel in System Preferences."
-        exit 0;
-        fi
-        ## script will now take user to JAMF policy built-in Software Update component. IF FORCING UPDATES WITH THIS SCRIPT, MAKE SURE SCRIPT PRIORITY IS SET TO 'BEFORE'!
-    fi
-}
 
 
 # If OS is already up to date but additional check for updates has been marked "yes" in JAMF parameters, still look for updates. Alter notification message if updates found
@@ -340,12 +362,14 @@ function checkForUpdatesAndPrompt {
 # In other words, you should not be deploying patching efforts to bring computers up to date to an OS version like 10.0.0 and still be updating machines with OS Version 10.0.1
 # If this is your scenario, your desiredOSVersionFullString should simply be 10.0.1, not 10.0.0 
 if [ "${osVersionFullString}" == "${desiredOSVersionFullString}" ] && [ "${additionalCheckForUpdates}" == 'true' ];then 
+    validateAndClearTempDirectories
     echo "OS version meets minimum version requirements but JAMF admin has specified to STILL CHECK for further updates. Checking for further updates.."
     checkForUpdatesAndPrompt
     exit 0
 
 # If the major, minor, or build revision version of the current OS is LESS than what the minimum accepted OS version is, the OS is out of date, proceed to check for updates.
 elif [ "${osMajor}" -lt "${desiredOSMajorVersion}" ] || [ "${osMinor}" -lt "${desiredOSMinorVersion}" ] || [ "${osBuildRevision}" -lt "${desiredOSRevisionBuildNumber}" ]; then
+    validateAndClearTempDirectories
     echo "Computer OS version does NOT meet minimal requirements. Checking for further updates.."
     checkForUpdatesAndPrompt
     exit 0
