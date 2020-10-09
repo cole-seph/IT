@@ -68,7 +68,7 @@
 ## 8. Check logs in "/tmp/YOUR_COMPANY_NAME_HEREJamfPatchingDependencies"
 
 companyName='YOUR_COMPANY_NAME_HERE' ## Leave the single quotations. Do not include spaces or special characters
-errVariable = ''
+errVariable=''
 
 ## Steps to upload into JAMF via the JAMF console
 ## 1. Upload this script to JAMF scripts by going to JAMF console -> Settings -> Computer Management -> Scripts -> New
@@ -113,7 +113,6 @@ function printErrorsAndExit {
     echo 'Optional parameters'
     echo 'Parameter 7: icon URL'
     echo 'Parameter 8: timeout'
-
     echo "Stopping execution with error: $errVariable"
     exit 1
 }
@@ -127,7 +126,7 @@ function validateAndClearTempDirectories {
     if [ -d "$iconDirectory" ]; then
         echo "Temp JAMF Patching Dependencies folder already exists.. Deleting the folder and its contents and creating a fresh new directory.."
     rm -rf "$iconDirectory" || {
-        errVariable = "Error removing old temporary directory"
+        errVariable="Error removing old temporary directory"
         printErrorsAndExit
     }
     fi
@@ -198,32 +197,32 @@ echo "Starting script.. Date: $(date +"%Y-%b-%d %T")"
 echo "####################"
 echo "Validating required parameters.."
 if [ ! -n "$4" ]; then
-    errVariable = "Error! 1st JAMF input variable null.  Please define the desired OS version. Exiting script.."
+    errVariable="Error! 1st JAMF input variable null.  Please define the desired OS version. Exiting script.."
     printErrorsAndExit
 fi
 
 if [ ! -n "$5" ]; then
-    errVariable = "Error! 2nd JAMF input variable null. Please enter 'true' or 'false' for to specify the 'openSoftwareUpdatesInSystemPreferences' variable. If true, both a message prompt AND take the user to the built in macOS softwareupdates page in System Preferences to check for updates. Warning will ONLY prompt the user. Forced patching itself should be handled via the JAMF policy UI. Warning mode will not automatically install patches. Exiting script.."    exit 1
+    errVariable="Error! 2nd JAMF input variable null. Please enter 'true' or 'false' for to specify the 'openSoftwareUpdatesInSystemPreferences' variable. If true, both a message prompt AND take the user to the built in macOS softwareupdates page in System Preferences to check for updates. Warning will ONLY prompt the user. Forced patching itself should be handled via the JAMF policy UI. Warning mode will not automatically install patches. Exiting script.."    exit 1
 	printErrorsAndExit
 fi
 
 if [ ! -n "$6" ]; then
-    errVariable = "Error! 3rd JAMF input variable null. Please define whether or not to check for updates if OS version already up to date (input 'true' or 'false'). Exiting script.."
+    errVariable="Error! 3rd JAMF input variable null. Please define whether or not to check for updates if OS version already up to date (input 'true' or 'false'). Exiting script.."
 	printErrorsAndExit
 fi
 
 if [ ! -n "$7" ]; then
-    errVariable = "Error! 4th JAMF input variable null. Please define prompt banner heading. Exiting script.."
+    errVariable="Error! 4th JAMF input variable null. Please define prompt banner heading. Exiting script.."
 	printErrorsAndExit
 fi
 
 if [ ! -n "$8" ]; then
-    errVariable = "Error! 5th JAMF input variable null. Please define prompt message title. Exiting script.."
+    errVariable="Error! 5th JAMF input variable null. Please define prompt message title. Exiting script.."
 	printErrorsAndExit
 fi
 
 if [ ! -n "$9" ]; then
-    errVariable = "Error! 6th JAMF input variable null. Please define prompt message body. Exiting script.."
+    errVariable="Error! 6th JAMF input variable null. Please define prompt message body. Exiting script.."
 	printErrorsAndExit
 fi
 
