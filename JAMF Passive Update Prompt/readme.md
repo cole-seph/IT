@@ -4,7 +4,7 @@
 # Cole Johnson - Mapbox IT (https://www.linkedin.com/in/coleojohnson/) - 11/10/20
 
 ## Purpose of this script:
-This script scans for pending updates, prompts users with context, and then sends them to Software Update in System Preferences
+This open-sourced, licensed script scans for pending updates, prompts users with context, and then sends them to Software Update in System Preferences
 It is designed for smaller macOS fleets / IT departments and is a self-service way to update macOS clients in your fleet without IT administrators having to package up and deploy updates themselves
 It can be used with JAMF's built-in policy-ability to send highly customizable prompts to users before forcing updates
 Note: If you use the script in this method, be sure to set the script priority to "Before" so that the script prompts users before updates are forced
