@@ -17,7 +17,7 @@
 ## Title: JAMF Passive Update prompt
 
 # Author:
-# Cole Johnson - Mapbox IT (https://www.linkedin.com/in/coleojohnson/) - 10/04/20
+# Cole Johnson - Mapbox IT (https://www.linkedin.com/in/coleojohnson/) - 11/10/20
 
 ## Purpose of this script: 
 ## This script scans for pending updates, prompts users with context, and then sends them to Software Update in System Preferences
@@ -65,7 +65,7 @@
 ## 5. Put the script into a JAMF policy scoped to a JAMF computer group 
 ## 6. Ensure the computer group criteria checks against the same macOS version defined in your script parameter inputs
 ## 7. Deploy
-## 8. Check logs in "/tmp/YOUR_COMPANY_NAME_HEREJamfPatchingDependencies"
+## 8. Check logs in "/tmp/YOUR_COMPANY_NAME_HERE/JamfPatchingDependencies"
 
 companyName='YOUR_COMPANY_NAME_HERE' ## Leave the single quotations. Do not include spaces or special characters
 errVariable=''
@@ -76,20 +76,28 @@ errVariable=''
 ## 3. Paste the script contents into the JAMF script editor
 ## 4. Click the "Options" tab 
 ## 5. Set the parameters as follows (Starting at parameter "4"):
+
 ## Parameter 4: 
 ## "Desired OS Version (i.e. 10.15.5, if you want to make sure all computers are updated to 10.15.5 ) - REQUIRED"
+
 ## Parameter 5:
 ## "Open Software Update in System Preferences if machine is out of compliance and has pending updates? Ex: "true" OR "false" without quotes. Script validates this parameter. - REQUIRED" 
+
 ## Parameter 6: 
 ## "Do you want the script to still check for updates for machines whose OS version is already up to date with the "Desired OS Version"? (i.e. Do you want to check for supplemental updates?) (Ex: "true" OR "false") without quotes. - REQUIRED"
+
 ## Parameter 7: 
 ## "Prompt heading text -  (The banner text at the top banner of the pop-up. This is not the title above the body text) Ex: "(YOUR COMPANY NAME) IT Software Update Required" - without quotes - REQUIRED"
+
 ## Parameter 8:
 ## "Prompt body title - (The title of the pop-up body. This goes above the message text. This is not the banner title) Ex: "Software Updates" - without quotes - REQUIRED"
+
 ## Parameter 9: 
 ## "Prompt message body text - (The message in the pop-up you want users to see) Ex: "Your computer is missing critical updates. You have 1 hour to close all applications." - without quotes - REQUIRED"
+
 ## Parameter 10:
 ## "Prompt icon url - (Public link to the company patching icon. This icon will be displayed in the prompt.) - Not required"
+
 ## Parameter 11:
 ## "Prompt timeout seconds - (Timer until prompt closes and JAMF policy proceeds next actions, if any) - Default prompt timer: 3 hours (10800 seconds)." - Not required"
 
