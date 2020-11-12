@@ -6,6 +6,13 @@ This is a simple plug-n-play script to prompt your JAMF users and send them to S
 ### Author:
 ### Cole Johnson - Mapbox IT (https://www.linkedin.com/in/coleojohnson/) - 11/10/20
 
+### The prompt:
+![image](https://github.com/cole-seph/IT/blob/master/JAMF%20Passive%20Update%20Prompt/IMAGE%202020-11-11%2014:30:36.jpg?raw=true)
+### Clicking 'Ok' (optionally) takes you to Software Update in System Preferences
+![image](https://github.com/cole-seph/IT/blob/master/JAMF%20Passive%20Update%20Prompt/IMAGE%202020-11-11%2014:30:31.jpg?raw=true)
+## The completed policy then leaves you with a straightforward log in JAMF
+![image](https://github.com/cole-seph/IT/blob/master/JAMF%20Passive%20Update%20Prompt/IMAGE%202020-11-11%2014:30:40.jpg?raw=true)
+
 ## How to use:
 1. Set your company name in the "your_company_name" variable and save the script
 2. (Optional) Upload a publicly-accessible icon to be used in the patching prompt
