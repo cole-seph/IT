@@ -1,7 +1,7 @@
 # JAMF Passive Update prompt
 
 # Summary:
-This is a simple plug-n-play script to prompt your JAMF users and send them to System Preferences to update if they either have pending updates or are not up to date with a certain version of macOS.
+This is a simple plug-n-play script to prompt your JAMF users and send them to System Preferences to update if they either have pending updates or are not up to date with a certain version of macOS. It is highly customizable and makes use of JAMF's built-in jamfhelper prompt.
 
 ### Author:
 ### Cole Johnson - Mapbox IT (https://www.linkedin.com/in/coleojohnson/) - 11/10/20
