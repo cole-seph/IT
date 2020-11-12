@@ -60,27 +60,35 @@ This script is designed to be run from JAMF. However, the only JAMF dependency i
 
 ## Parameters:
 Parameter 4: 
+
 "Desired OS Version (i.e. 10.15.5, if you want to make sure all computers are updated to 10.15.5 ) - REQUIRED"
 
 Parameter 5:
+
 "Open Software Update in System Preferences if machine is out of compliance and has pending updates? Ex: "true" OR "false" without quotes. Script validates this parameter. - REQUIRED" 
 
 Parameter 6: 
+
 "Do you want the script to still check for updates for machines whose OS version is already up to date with the "Desired OS Version"? (i.e. Do you want to check for supplemental updates?) (Ex: "true" OR "false") without quotes. - REQUIRED"
 
 Parameter 7: 
+
 "Prompt heading text -  (The banner text at the top banner of the pop-up. This is not the title above the body text) Ex: "(YOUR COMPANY NAME) IT Software Update Required" - without quotes - REQUIRED"
 
 Parameter 8:
+
 "Prompt body title - (The title of the pop-up body. This goes above the message text. This is not the banner title) Ex: "Software Updates" - without quotes - REQUIRED"
 
 Parameter 9: 
+
 "Prompt message body text - (The message in the pop-up you want users to see) Ex: "Your computer is missing critical updates. You have 1 hour to close all applications." - without quotes - REQUIRED"
 
 Parameter 10:
+
 "Prompt icon url - (Public link to the company patching icon. This icon will be displayed in the prompt.) - Not required"
 
 Parameter 11:
+
 "Prompt timeout seconds - (Timer until prompt closes and JAMF policy proceeds next actions, if any) - Default prompt timer: 3 hours (10800 seconds)." - Not required"
 
 
