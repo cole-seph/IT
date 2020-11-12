@@ -61,4 +61,6 @@ This script is designed to be run from JAMF. However, the only JAMF dependency i
 ## Optional:
 Public icon url (for customized patching prompts)
 
+An extended version of this readme can be found within the script itself.
+
 
