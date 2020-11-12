@@ -59,7 +59,7 @@ macOS 10.13 (High Sierra) - macOS 10.15 (Catalina)
 This script is designed to be run from JAMF. However, the only JAMF dependency is the JAMF Helper ("/Library/Application Support/JAMF/bin/jamfHelper.app/Contents/MacOS/jamfHelper"), i.e. the program used for the prompt itself. This script could easily be re-purposed to work with other prompt types that are not JAMF-dependent.
 
 ## Parameters:
-**Parameter 4: **
+**Parameter 4:**
 
 "Desired OS Version (i.e. 10.15.5, if you want to make sure all computers are updated to 10.15.5 ) - REQUIRED"
 
@@ -67,11 +67,11 @@ This script is designed to be run from JAMF. However, the only JAMF dependency i
 
 "Open Software Update in System Preferences if machine is out of compliance and has pending updates? Ex: "true" OR "false" without quotes. Script validates this parameter. - REQUIRED" 
 
-**Parameter 6: **
+**Parameter 6:**
 
 "Do you want the script to still check for updates for machines whose OS version is already up to date with the "Desired OS Version"? (i.e. Do you want to check for supplemental updates?) (Ex: "true" OR "false") without quotes. - REQUIRED"
 
-**Parameter 7: **
+**Parameter 7:**
 
 "Prompt heading text -  (The banner text at the top banner of the pop-up. This is not the title above the body text) Ex: "(YOUR COMPANY NAME) IT Software Update Required" - without quotes - REQUIRED"
 
@@ -79,7 +79,7 @@ This script is designed to be run from JAMF. However, the only JAMF dependency i
 
 "Prompt body title - (The title of the pop-up body. This goes above the message text. This is not the banner title) Ex: "Software Updates" - without quotes - REQUIRED"
 
-**Parameter 9: **
+**Parameter 9:**
 
 "Prompt message body text - (The message in the pop-up you want users to see) Ex: "Your computer is missing critical updates. You have 1 hour to close all applications." - without quotes - REQUIRED"
 
