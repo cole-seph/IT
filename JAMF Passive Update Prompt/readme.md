@@ -47,11 +47,6 @@ This also has the following added benefits:
 ## Other features:
 Allows JAMF administrators to decide whether or not to check for updates if the client has already met the desired OS version
 
-
-## Who this script is not for:
-If you want any software updates making their ways to users to have been re-packaged or further customized by IT first, this solution is not for you.
-This is also likely not for large enterprises with internal update repositories or air-gapped environments.
-
 ## Tested on:
 macOS 10.13 (High Sierra) - macOS 10.15 (Catalina)
 
